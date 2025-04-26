@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { Menu } from 'lucide-react';
 
@@ -54,9 +55,9 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h1 className="text-xl font-bold tracking-wider">
+          <Link to="/" className="text-xl font-bold tracking-wider">
             <span className="text-primary">ROZEN</span>
-          </h1>
+          </Link>
         </div>
         
         <div className="flex items-center space-x-2">
@@ -64,6 +65,8 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             <a href="#about" className="animated-underline py-1 text-sm font-medium">About</a>
             <a href="#experience" className="animated-underline py-1 text-sm font-medium">Experience</a>
             <a href="#projects" className="animated-underline py-1 text-sm font-medium">Projects</a>
+            <a href="#contact" className="animated-underline py-1 text-sm font-medium">Contact</a>
+            <Link to="/admin" className="py-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors">Admin</Link>
           </nav>
           <ThemeToggle />
         </div>

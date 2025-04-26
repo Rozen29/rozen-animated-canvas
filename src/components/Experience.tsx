@@ -67,30 +67,57 @@ const experiences: ExperienceItem[] = [
 ];
 
 const Experience = () => {
-  const observerRefs = useRef<HTMLDivElement[]>([]);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    // Set up intersection observer for the timeline connector
+    const timelineObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          if (timelineRef.current) {
+            timelineRef.current.classList.add('after:animate-timeline-grow');
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (timelineRef.current) {
+      timelineObserver.observe(timelineRef.current);
+    }
+    
+    // Set up intersection observer for individual timeline items
+    const itemObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const isEven = Number(entry.target.getAttribute('data-index')) % 2 === 0;
-            entry.target.classList.add(isEven ? 'animate-slide-in-right' : 'animate-slide-in-left');
-            observer.unobserve(entry.target);
+            const index = Number(entry.target.getAttribute('data-index'));
+            const isEven = index % 2 === 0;
+            
+            // Apply different animations based on whether the item is on the left or right
+            entry.target.classList.remove('opacity-0');
+            entry.target.classList.add(
+              isEven ? 'animate-slide-in-right' : 'animate-slide-in-left'
+            );
+            
+            // Stop observing after animation is applied
+            itemObserver.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.2, rootMargin: '-50px 0px' }
     );
-
-    observerRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
+    
+    // Start observing each timeline item
+    itemRefs.current.forEach((ref) => {
+      if (ref) itemObserver.observe(ref);
     });
-
+    
+    // Cleanup
     return () => {
-      observerRefs.current.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
+      timelineObserver.disconnect();
+      itemObserver.disconnect();
     };
   }, []);
   
@@ -99,14 +126,17 @@ const Experience = () => {
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center">Experience</h2>
         
-        <div className="timeline-container relative">
+        <div 
+          ref={timelineRef}
+          className="timeline-container relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:w-0.5 after:bg-primary/50 after:h-0 after:top-0 after:transition-all after:duration-1500"
+        >
           {experiences.map((exp, index) => (
-            <div key={exp.id} className="timeline-item mb-24 last:mb-0">
-              <div className="timeline-dot"></div>
+            <div key={exp.id} className={`timeline-item mb-24 last:mb-0 relative flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
+              <div className="timeline-dot absolute left-1/2 top-0 -translate-x-1/2 w-4 h-4 rounded-full bg-primary shadow-lg z-10"></div>
               <div 
-                ref={el => el && (observerRefs.current[index] = el)}
+                ref={el => itemRefs.current[index] = el}
                 data-index={index}
-                className="timeline-content opacity-0 bg-card hover:shadow-lg transition-shadow duration-300"
+                className={`timeline-content opacity-0 w-[calc(50%-3rem)] p-6 rounded-lg bg-card border shadow-md transition-all duration-500 hover:shadow-lg ${index % 2 === 0 ? 'mr-12' : 'ml-12'}`}
               >
                 <span className="text-sm text-muted-foreground block mb-2">{exp.date}</span>
                 <h3 className="font-bold text-xl mb-1">{exp.title}</h3>
