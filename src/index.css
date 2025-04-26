@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -124,6 +123,31 @@
 
   .typing-text {
     @apply animate-type-text overflow-hidden whitespace-nowrap border-r-4 border-primary;
+  }
+
+  .timeline-container {
+    @apply relative;
+  }
+
+  .timeline-container::before {
+    content: '';
+    @apply absolute left-[calc(50%-1px)] top-0 h-full w-0.5 bg-primary/20 dark:bg-primary/20;
+  }
+
+  .timeline-item {
+    @apply flex justify-end w-full relative mb-24 last:mb-0;
+  }
+
+  .timeline-item:nth-child(even) {
+    @apply justify-start;
+  }
+
+  .timeline-dot {
+    @apply absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary shadow-lg z-10;
+  }
+
+  .timeline-content {
+    @apply w-[calc(50%-3rem)] px-8 py-6 rounded-xl bg-card border shadow-md;
   }
 }
 
