@@ -2,10 +2,47 @@
 import React, { useEffect, useRef } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from './ui/sonner';
+
+// Define contact form schema
+const contactFormSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  email: z.string().email({ message: 'Invalid email address' }),
+  subject: z.string().min(1, { message: 'Subject is required' }),
+  message: z.string().min(10, { message: 'Message must be at least 10 characters' }),
+});
+
+type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 const Contact = () => {
   const contactRef = useRef<HTMLDivElement>(null);
   const lanyardRef = useRef<HTMLDivElement>(null);
+
+  // Initialize form
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
+    },
+  });
+
+  function onSubmit(data: ContactFormValues) {
+    console.log('Form submitted:', data);
+    toast.success("Message sent successfully!", {
+      description: "I'll get back to you as soon as possible.",
+      duration: 5000,
+    });
+    form.reset();
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -81,38 +118,70 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="bg-card p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4">Send a Message</h3>
-            <form className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  className="w-full p-2 border border-border rounded-md bg-background"
-                  placeholder="Your Name"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full p-2 border border-border rounded-md bg-background"
-                  placeholder="your.email@example.com"
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="your.email@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium mb-1">Message</label>
-                <textarea
-                  id="message"
-                  rows={4}
-                  className="w-full p-2 border border-border rounded-md bg-background resize-none"
-                  placeholder="Your message here..."
-                ></textarea>
-              </div>
-              <Button type="submit" className="w-full">
-                Send Message
-              </Button>
-            </form>
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Subject" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Your message here..." 
+                          className="resize-none" 
+                          rows={4}
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Send Message
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
       </div>
