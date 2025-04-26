@@ -24,7 +24,7 @@ const Contact = () => {
   const contactRef = useRef<HTMLDivElement>(null);
   const lanyardRef = useRef<HTMLDivElement>(null);
 
-  // Initialize form
+  // Initialize form with default values
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -51,10 +51,11 @@ const Contact = () => {
           if (entry.isIntersecting) {
             if (entry.target === contactRef.current) {
               entry.target.classList.add('animate-fade-in');
+              entry.target.classList.remove('opacity-0');
             } else if (entry.target === lanyardRef.current) {
               entry.target.classList.add('animate-slide-in-left');
+              entry.target.classList.remove('opacity-0', 'transform', '-translate-x-full');
             }
-            observer.unobserve(entry.target);
           }
         });
       },
@@ -102,15 +103,15 @@ const Contact = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Mail className="text-primary" />
-                <span>contact@rozen.dev</span>
+                <span>contact@afrizal.dev</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="text-primary" />
-                <span>+1 (555) 123-4567</span>
+                <span>+62 812 3456 7890</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="text-primary" />
-                <span>New York, NY</span>
+                <span>Bandung, Indonesia</span>
               </div>
             </div>
           </div>
